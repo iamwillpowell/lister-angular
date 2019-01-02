@@ -30,7 +30,14 @@ export class ListerService {
     return this.http.post(this.baseUrl + 'lists/', newList, httpOptions);
   }
 
-  getList(listId) {
-    return this.http.get(this.baseUrl + 'list/' + listId);
+  updateList(listId: string, list: List) {
+    const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
+    return this.http.put(this.baseUrl + 'lists/' + listId, list);
   }
+
+  getList(listId) {
+    return this.http.get(this.baseUrl + 'lists/' + listId);
+  }
+
+
 }

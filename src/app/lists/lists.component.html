@@ -1,0 +1,15 @@
+
+  <h1>Lister</h1>
+  <h2>
+    Lists <button mat-icon-button routerLink="/list"><mat-icon>add</mat-icon></button>
+  </h2>
+  <mat-divider></mat-divider>
+  <mat-nav-list class="list">
+    <mat-list-item class="list-item" *ngFor="let list of lists">
+      <a matLine routerLink="/list/{{ list._id }}">{{ list.title }}</a>
+      <button mat-icon-button (click)="deleteList(list._id)"><mat-icon>clear</mat-icon></button>
+    </mat-list-item>
+  </mat-nav-list>
+  <p *ngIf="!lists.length">No lists yet. Why not create one?</p>
+  <br /><br />
+

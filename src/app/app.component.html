@@ -1,18 +1,1 @@
-<h1>{{title}}</h1>
-
-<ul>
-  <li *ngFor="let list of lists">{{list.title}}<br>{{list.text}}<br> <button (click)="deleteList(list._id)">remove</button></li>
-</ul>
-
-<form [formGroup]="listFormGroup" (ngSubmit)="onSubmit()">
-  <label>List Name<br>
-  <input type="text" formControlName="listName">
-</label><br>
-  <label>List Body<br>
-    <input type="text" formControlName="listBody">
-  </label><br>
-  <button type="submit" [disabled]="listFormGroup.invalid">Create List</button><br>
-</form>
-
-{{listFormGroup.value | json}}<br>
-{{listFormGroup.status}}
+<router-outlet></router-outlet>
