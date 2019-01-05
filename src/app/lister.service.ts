@@ -8,16 +8,16 @@ import { List } from './app.component';
 export class ListerService {
 
   // TODO: get URL from a config file, could be based on env.
-  private baseUrl = 'http://localhost:8000/';
+  private baseUrl = '/api/lists/';
 
   constructor(private http: HttpClient) { }
 
   getLists() {
-    return this.http.get(this.baseUrl + 'lists/');
+    return this.http.get(this.baseUrl);
   }
 
   deleteList(_id) {
-    return this.http.delete(this.baseUrl + 'lists/' + _id, { responseType: 'text' });
+    return this.http.delete(this.baseUrl + _id, { responseType: 'text' });
   }
 
   addList(newList: List) {
@@ -27,16 +27,16 @@ export class ListerService {
       })
     };
 
-    return this.http.post(this.baseUrl + 'lists/', newList, httpOptions);
+    return this.http.post(this.baseUrl, newList, httpOptions);
   }
 
   updateList(listId: string, list: List) {
     const httpOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
-    return this.http.put(this.baseUrl + 'lists/' + listId, list);
+    return this.http.put(this.baseUrl + listId, list);
   }
 
   getList(listId) {
-    return this.http.get(this.baseUrl + 'lists/' + listId);
+    return this.http.get(this.baseUrl + listId);
   }
 
 
