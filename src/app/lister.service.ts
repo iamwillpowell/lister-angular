@@ -8,7 +8,7 @@ import { List } from './app.component';
 export class ListerService {
 
   // TODO: get URL from a config file, could be based on env.
-  private baseUrl = 'http://localhost:8000/';
+  private baseUrl = '/api';
 
   constructor(private http: HttpClient) { }
 
