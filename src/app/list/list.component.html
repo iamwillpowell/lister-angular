@@ -1,9 +1,17 @@
 <mat-sidenav-container class="list-container">
   <mat-sidenav mode="side" opened="true">
     <div class="nav-container">
-    <p><a routerLink="/lists">Lists</a></p>
-    nav<br />
-    more nav
+    <h1>
+      <a routerLink="/lists">Lister</a>
+    </h1>
+
+    <p>
+      <a routerLink="/list/">New +</a>
+    </p>
+
+    <p *ngFor="let list of lists">
+      <a routerLink="/list/{{list._id}}">{{list.title}}</a>
+    </p>
 </div>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -11,10 +19,19 @@
       <form [formGroup]="listFormGroup" (ngSubmit)="onSubmit()">
         <mat-form-field><input matInput placeholder="Name" formControlName="listName"/></mat-form-field><br />
         <mat-form-field><input matInput placeholder="Body" formControlName="listBody"/></mat-form-field><br />
+        <div formArrayName="listItems" >
+          <div *ngFor="let listItem of listItems.controls; let i = index;">
+            <mat-form-field >
+              <input matInput placeholder="" [formControlName]="i"/>
+            </mat-form-field>
+          </div>
+        </div>
+        <br />
         <button mat-raised-button color="primary" type="submit" [disabled]="listFormGroup.invalid">Save</button>
+        <button *ngIf="listId" mat-button color="secondary" (click)="deleteList()">Delete</button>
         {{ status }}<br />
       </form>
-      <!-- {{listFormGroup.value | json}}<br> {{listFormGroup.status}} -->
+      {{listFormGroup.value | json}}<br> {{listFormGroup.status}}
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

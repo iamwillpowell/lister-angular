@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { ListerService } from '../lister.service';
-import { List } from '../app.component';
-import { FormBuilder, Validators } from '@angular/forms';
+import { List } from '../list';
+import { FormBuilder, Validators, FormGroup, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'app-list',
@@ -11,12 +11,20 @@ import { FormBuilder, Validators } from '@angular/forms';
 })
 export class ListComponent implements OnInit {
   listId: string;
+  lists: List[];
   status = '';
-
-  listFormGroup = this.formBuilder.group({
+  listFormGroup: FormGroup = this.formBuilder.group({
     listName: ['', Validators.required],
-    listBody: ['', Validators.required]
+    listBody: ['', Validators.required],
+    listItems: this.formBuilder.array([
+      // this.formBuilder.control(''),
+    ])
   });
+
+  get listItems(): FormArray {
+    return this.listFormGroup.get('listItems') as FormArray;
+  }
+
 
   constructor(
     private route: ActivatedRoute,
@@ -30,16 +38,52 @@ export class ListComponent implements OnInit {
       this.listId = paramMap.get('id');
       if (this.listId) {
         this.loadList();
+      } else {
+        this.initList();
       }
+    });
+
+    this.getLists();
+  }
+
+  initList() {
+    this.listFormGroup.setValue({
+      listName: '',
+      listBody: '',
+      listItems: []
+    });
+    this.listItems.push(this.formBuilder.control(''));
+  }
+
+  createListItem(text: string): FormGroup {
+    return this.formBuilder.group({
+      type: 'bullet',
+      text: text
+    });
+  }
+
+  getLists() {
+    this.listerService.getLists().subscribe((data: List[]) => {
+      this.lists = data;
     });
   }
 
   loadList() {
+    this.initList();
     this.listerService.getList(this.listId).subscribe((response: List) => {
       this.listFormGroup.setValue({
         listName: response.title,
-        listBody: response.text
+        listBody: response.text,
+        listItems: ['']
       });
+      if (response.items) {
+        response.items.map(item => {
+          this.listItems.push(this.formBuilder.control(item));
+        });
+      }
+      if (this.listItems.controls[this.listItems.controls.length - 1].value !== '') {
+        this.listItems.push(this.formBuilder.control(''));
+      }
     });
   }
 
@@ -50,12 +94,17 @@ export class ListComponent implements OnInit {
     if (this.listId) {
       this.updateList();
     } else {
-      this.newList();
+      this.saveNewList();
     }
+    this.getLists();
   }
 
-  newList() {
-    const newList: List = { title: this.listFormGroup.value.listName, text: this.listFormGroup.value.listBody };
+  saveNewList() {
+    const newList: List = {
+      title: this.listFormGroup.value.listName,
+      text: this.listFormGroup.value.listBody,
+      items: this.listFormGroup.value.listItems
+    };
     this.listerService.addList(newList).subscribe((response: List) => {
       // TODO: update location without route change so status works as expected.
       this.router.navigate(['/list/' + response._id]);
@@ -64,14 +113,31 @@ export class ListComponent implements OnInit {
   }
 
   updateList() {
-    const list: List = { title: this.listFormGroup.value.listName, text: this.listFormGroup.value.listBody };
+    const list: List = {
+      title: this.listFormGroup.value.listName,
+      text: this.listFormGroup.value.listBody,
+      items: this.listFormGroup.value.listItems
+
+    };
     this.listerService.updateList(this.listId, list).subscribe(response => {
+      console.log(response);
       this.showStatus('Saved');
+      this.loadList();
+    });
+  }
+
+  deleteList() {
+    if (!this.listId) {
+      return;
+    }
+    this.listerService.deleteList(this.listId).subscribe(response => {
+      console.log(response);
+      this.router.navigate(['/list/']);
     });
   }
 
   showStatus(status) {
     this.status = status;
-    setTimeout(() => this.status = '', 3000);
+    setTimeout(() => (this.status = ''), 3000);
   }
 }
